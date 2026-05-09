@@ -36,6 +36,36 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/specificuser',async(req,res)=>{
+      const email=req.query.email;
+      const query={};
+
+      if(email){
+        query.email=email;
+      }
+      const cursor=usersColl.find(query);
+      const result=await cursor.toArray();
+      res.send(result)
+    })
+
+
+    app.patch('/specificuser',async(req,res)=>{
+      const email=req.query.email;
+      const updatedData=req.body;
+      const query={};
+
+      if(email){
+        query.email=email;
+      }
+
+      const updateDoc = {
+    $set: updatedData
+  };
+
+      const result=await usersColl.updateOne(query,updateDoc);
+      res.send(result)
+    })
+
     app.get("/users/:id", async (req, res) => {
       
        const id = req.params.id;
@@ -43,6 +73,22 @@ async function run() {
       const result = await usersColl.findOne(query);
       res.send(result);
     });
+
+
+app.delete('/users/:id',async(req,res)=>{
+  const id=req.params.id;
+
+  const query={_id:new ObjectId(id)};
+  const result=await usersColl.deleteOne(query);
+  res.send(result);
+})
+
+    app.post('/users',async(req,res)=>{
+      const user=req.body;
+
+      const result=await usersColl.insertOne(user);
+      res.send(result)
+    })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
