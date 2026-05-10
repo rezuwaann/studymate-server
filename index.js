@@ -31,12 +31,20 @@ async function run() {
     const usersColl = mydb.collection("users");
    const bannerColl = mydb.collection("carousel");
    const connections = mydb.collection("connections");
+   const studyProfiles = mydb.collection("studyProfiles");
 
     app.get("/users", async (req, res) => {
       const cursor = usersColl.find({});
       const result = await cursor.toArray();
       res.send(result);
     });
+
+    app.get("/studyprofiles", async (req, res) => {
+      const cursor = studyProfiles.find({});
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+   
 
     app.get("/specificuser", async (req, res) => {
       const email = req.query.email;
@@ -100,7 +108,32 @@ async function run() {
     app.post("/users", async (req, res) => {
       const user = req.body;
 
+     
       const result = await usersColl.insertOne(user);
+      res.send(result);
+    });
+
+    app.post("/studyprofiles", async (req, res) => {
+      const user = req.body;
+
+       const query={
+        studyMode: user?.studyMode,
+      availabilityTime: user?.availabilityTime,
+      subject: user?.subject,
+      experienceLevel: user?.experienceLevel,
+      location: user?.location,
+      }
+
+      const exists=await studyProfiles.findOne(query);
+
+      if (exists) {
+        res.send({
+          insertedId:false
+        })
+        return;
+      }
+
+      const result = await studyProfiles.insertOne(user);
       res.send(result);
     });
 
@@ -115,10 +148,7 @@ async function run() {
       const alreadyExists=await connections.findOne(query);
 
       if (alreadyExists) {
-        res.send({
-          inserted:false,
-          message:"already exists"
-        })
+       res.send({insertedId:false})
         return;
       }
       const result=await connections.insertOne(newConnection);
