@@ -60,7 +60,7 @@ async function run() {
 
     app.get("/users/:id", async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
+      const query = { _id: id };
       const result = await usersColl.findOne(query);
       res.send(result);
     });
@@ -117,6 +117,10 @@ async function run() {
       const user = req.body;
 
        const query={
+        connectorNmae:user?.name,
+      connectedName:partner?.name,
+      connectorEmail:user?.email,
+      connectedEmail:partner?.email,
         studyMode: user?.studyMode,
       availabilityTime: user?.availabilityTime,
       subject: user?.subject,
@@ -141,8 +145,8 @@ async function run() {
       const newConnection=req.body;
 
       const query={
-        connectorId:newConnection.connectorId,
-        connectedId:newConnection.connectedId
+        connectorName:newConnection.connectorName,
+        connectedName:newConnection.connectedName
       }
 
       const alreadyExists=await connections.findOne(query);
