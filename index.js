@@ -29,6 +29,8 @@ async function run() {
 
     const mydb = client.db("studymate");
     const usersColl = mydb.collection("users");
+   const bannerColl = mydb.collection("carousel");
+   const connections = mydb.collection("connections");
 
     app.get("/users", async (req, res) => {
       const cursor = usersColl.find({});
@@ -36,58 +38,91 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/specificuser',async(req,res)=>{
-      const email=req.query.email;
-      const query={};
+    app.get("/specificuser", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
 
-      if(email){
-        query.email=email;
+      if (email) {
+        query.email = email;
       }
-      const cursor=usersColl.find(query);
-      const result=await cursor.toArray();
-      res.send(result)
-    })
-
-
-    app.patch('/specificuser',async(req,res)=>{
-      const email=req.query.email;
-      const updatedData=req.body;
-      const query={};
-
-      if(email){
-        query.email=email;
-      }
-
-      const updateDoc = {
-    $set: updatedData
-  };
-
-      const result=await usersColl.updateOne(query,updateDoc);
-      res.send(result)
-    })
+      const cursor = usersColl.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     app.get("/users/:id", async (req, res) => {
-      
-       const id = req.params.id;
+      const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await usersColl.findOne(query);
       res.send(result);
     });
 
+    app.get("/banner", async (req, res) => {
+    
 
-app.delete('/users/:id',async(req,res)=>{
-  const id=req.params.id;
-
-  const query={_id:new ObjectId(id)};
-  const result=await usersColl.deleteOne(query);
-  res.send(result);
-})
-
-    app.post('/users',async(req,res)=>{
-      const user=req.body;
-
-      const result=await usersColl.insertOne(user);
+      const cursor= bannerColl.find({});
+      const result=await cursor.toArray();
       res.send(result)
+    });
+
+    app.get('/connections',async(req,res)=>{
+      
+
+      const cursor=connections.find({});
+      const result=await cursor.toArray();
+      res.send(result); 
+    })
+    app.patch("/specificuser", async (req, res) => {
+      const email = req.query.email;
+      const updatedData = req.body;
+      const query = {};
+
+      if (email) {
+        query.email = email;
+      }
+
+      const updateDoc = {
+        $set: updatedData,
+      };
+
+      const result = await usersColl.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = { _id: new ObjectId(id) };
+      const result = await usersColl.deleteOne(query);
+      res.send(result);
+    });
+
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+
+      const result = await usersColl.insertOne(user);
+      res.send(result);
+    });
+
+    app.post("/connections",async(req,res)=>{
+      const newConnection=req.body;
+
+      const query={
+        connectorId:newConnection.connectorId,
+        connectedId:newConnection.connectedId
+      }
+
+      const alreadyExists=await connections.findOne(query);
+
+      if (alreadyExists) {
+        res.send({
+          inserted:false,
+          message:"already exists"
+        })
+        return;
+      }
+      const result=await connections.insertOne(newConnection);
+      res.send(result);
     })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
