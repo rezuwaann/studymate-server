@@ -29,7 +29,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.options("/{*path}", cors(corsOptions));
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
