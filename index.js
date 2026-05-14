@@ -5,33 +5,6 @@ const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 3000;
 
-// app.use(
-//   cors({
-//     origin: [
-//       "http://localhost:5173",
-//       "https://studymate-client-seven.vercel.app"
-//     ],
-//     credentials: true,
-//   }),
-// );
-
-const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "https://studymate-client-seven.vercel.app",
-  ],
-  credentials: true,
-};
-
-
-const cookieParser = require("cookie-parser"); 
-app.use(cookieParser());
-app.use(express.json());
-
-app.use(cors(corsOptions));
-app.options("/{*path}", cors(corsOptions));
-
-
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.atbpap4.mongodb.net/?appName=Cluster0`;
 
@@ -45,9 +18,8 @@ const client = new MongoClient(uri, {
   },
 });
 
-
-
-
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 const verifyJWTToken = async (req, res, next) => {
   console.log("jwt middleware", req.headers);
@@ -73,7 +45,7 @@ const verifyJWTToken = async (req, res, next) => {
   });
 };
 
-
+app.use(express.json());
 
 // app.use(cors());
 
@@ -82,7 +54,15 @@ const logger = (req, res, next) => {
   next();
 };
 //Must remove "/" from your production URL
-
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://studymate-client-seven.vercel.app"
+    ],
+    credentials: true,
+  }),
+);
 
 const cookieOptions = {
   httpOnly: true,
