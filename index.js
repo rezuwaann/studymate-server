@@ -5,15 +5,24 @@ const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 3000;
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://studymate-client-seven.vercel.app"
-    ],
-    credentials: true,
-  }),
-);
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:5173",
+//       "https://studymate-client-seven.vercel.app"
+//     ],
+//     credentials: true,
+//   }),
+// );
+
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "https://studymate-client-seven.vercel.app",
+  ],
+  credentials: true,
+};
+
 
 const cookieParser = require("cookie-parser"); 
 app.use(cookieParser());
